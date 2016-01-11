@@ -17,11 +17,15 @@ extern "C"{
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <converter.h>
 
 using namespace std;
 
-
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55,28,1)
+#define av_frame_alloc avcodec_alloc_frame
+#define av_frame_free avcodec_free_frame
+#endif
+#define RNDTO2(X) ( ( (X) & 0xFFFFFFFE ))
+#define RNDTO32(X) ( ( (X) % 32 ) ? ( ( (X) + 32 ) & 0xFFFFFFE0 ) : (X) )
 
 class converter{
 
@@ -47,7 +51,7 @@ private:
     
     //udp output
     bool tag_inited_udp = false;
-    string m_output("udp://147.8.179.120:6666");
+    string m_output;
     AVFormatContext* m_formatContext;
     AVStream* m_stream;
     
@@ -64,7 +68,7 @@ private:
     
     void init_output_file(){
         tag_inited_file = true;
-        fp_yuv=fopen(output_file_name,"wb+");
+        fp_yuv=fopen(output_file_name.c_str(),"wb+");
     }
     
     void clean_output_file(){
@@ -162,7 +166,7 @@ private:
     }
     
 public:
-    converter(){
+    converter():m_output("udp://147.8.179.120:6666"),output_file_name("out_put_file.yuv"){
         // Register all formats and codecs
         av_register_all();
         
@@ -171,6 +175,8 @@ public:
         
         // set error levle
         av_log_set_level(AV_LOG_TRACE);
+        
+        init_output_file();
     }
     
     int load_file(std::string file_name){
@@ -290,7 +296,7 @@ public:
     
     
     void process_file(){
-        
+        init_nvenc_encoder();
         AVPacket  packet;
         // Allocate video frame
         AVFrame*    pFrame =av_frame_alloc();
@@ -312,12 +318,15 @@ public:
                     //encode with nvenc
                     AVPacket&& Outpacket = encode_frame(pictYUV);
                     
+                    if (tag_inited_file==true) {
                     //output to file
                     fwrite(Outpacket.data,1,Outpacket.size,fp_yuv);
+                    }
                     
+                    if (tag_inited_udp==true){
                     //output to udp
                     av_write_frame(m_formatContext, &Outpacket);
-                    
+                    }
                     
                     
                     //Free the packet that was allocated by encoder
@@ -336,7 +345,9 @@ public:
     
     
     ~converter(){
-        
+        if (tag_inited_file==true) {
+            clean_output_file();
+        }
         // Close the codecs
         if (tag_inited_decode==true) {
             avcodec_close(pCodecCtx);
@@ -352,6 +363,7 @@ public:
             avformat_free_context(m_formatContext);
 
         }
+
 
     }
     
