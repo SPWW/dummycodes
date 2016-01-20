@@ -17,3 +17,7 @@ just use it as a draft storage.
   use std::thread interface like to build a thread pool class
   
   useless and stupid.
+  
+## simple thread pool
+
+  use optical for object tracking.
