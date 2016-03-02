@@ -21,3 +21,7 @@ just use it as a draft storage.
 ## optical flow
 
   use optical for object tracking.
+  
+## Qt stream player
+
+  A simple demo of stream video player builded with Qt and Vlclib.
