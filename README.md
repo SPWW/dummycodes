@@ -25,3 +25,7 @@ just use it as a draft storage.
 ## Qt stream player
 
   A simple demo of stream video player builded with Qt and Vlclib.
+  
+## send email via python
+
+  use python smtplib connect to smtp server and send a email with attachment.
