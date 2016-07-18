@@ -26,6 +26,10 @@ just use it as a draft storage.
 
   A simple demo of stream video player builded with Qt and Vlclib.
   
+## Ipv6 server
+
+  A simple ipv6 echo server for testing purpose. inspired by Socket test.
+  
 ## send email via python
 
   use python smtplib connect to smtp server and send a email with attachment.
