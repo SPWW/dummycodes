@@ -10,7 +10,7 @@ from email.header import Header
 
 
 ser = smtplib.SMTP_SSL("smtp.ym.163.com",465)
-ser.login("contact@hkaxj.com","123456")
+ser.login("email","pwd")
 
 #创建一个带附件的实例
 message = MIMEMultipart()
